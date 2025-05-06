@@ -1,4 +1,6 @@
 */.env
+training_images/
+generated_images/
 
 # Backend
 .venv
