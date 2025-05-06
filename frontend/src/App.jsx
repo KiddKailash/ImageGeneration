@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 
 // Local Components
 import Upload from './components/Upload';
 import Training from './components/Training';
 import Generation from './components/Generation';
+
+// API Services
+import { ServerAPI, SubjectAPI, TrainingAPI } from './services/api';
 
 // MUI Components
 import Box from '@mui/material/Box';
@@ -24,9 +26,6 @@ import UploadIcon from '@mui/icons-material/CloudUpload';
 import TrainingIcon from '@mui/icons-material/Psychology';
 import GenerateIcon from '@mui/icons-material/Image';
 
-// API Base URL - using environment variable with fallback
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
 function App() {
   const [activeTab, setActiveTab] = useState('upload');
   const [serverStatus, setServerStatus] = useState('connecting');
@@ -39,15 +38,15 @@ function App() {
   useEffect(() => {
     const checkStatus = async () => {
       try {
-        const response = await axios.get(`${API_URL}/status`);
-        setServerStatus(response.data.status);
+        const statusResponse = await ServerAPI.getStatus();
+        setServerStatus(statusResponse.status);
         
         // Fetch available subjects and checkpoints
-        const subjectsResponse = await axios.get(`${API_URL}/subjects`);
-        setSubjects(subjectsResponse.data.subjects || []);
+        const subjectsResponse = await SubjectAPI.getSubjects();
+        setSubjects(subjectsResponse.subjects || []);
         
-        const checkpointsResponse = await axios.get(`${API_URL}/checkpoints`);
-        setCheckpoints(checkpointsResponse.data.checkpoints || []);
+        const checkpointsResponse = await TrainingAPI.getCheckpoints();
+        setCheckpoints(checkpointsResponse.checkpoints || []);
       } catch (error) {
         console.error('Error connecting to server:', error);
         setServerStatus('offline');
@@ -130,13 +129,11 @@ function App() {
         <Box sx={{ mt: 2 }}>
           {activeTab === 'upload' && 
             <Upload 
-              apiUrl={API_URL} 
               onSuccess={() => setActiveTab('train')} 
             />
           }
           {activeTab === 'train' && 
             <Training 
-              apiUrl={API_URL} 
               subjects={subjects} 
               onSuccess={(newCheckpoint) => {
                 setCheckpoints([...checkpoints, newCheckpoint]);
@@ -146,7 +143,6 @@ function App() {
           }
           {activeTab === 'generate' && 
             <Generation 
-              apiUrl={API_URL} 
               checkpoints={checkpoints} 
             />
           }
