@@ -8,14 +8,11 @@ This project consists of:
 - **Backend API**: Flask server that handles image processing, model training, and image generation
 - **Frontend UI**: React web interface for uploading photos, training models, and generating images
 
-![Screenshot of the application](.github/screenshot.png)
-
 ## Features
 
-- **Upload Training Images**: Easily upload 5-20 photos of yourself or any subject
+- **Upload Training Images**: Upload 5-20 photos of yourself or any subject
 - **Train Custom Models**: Fine-tune a DALL-E model with your photos
 - **Generate Images**: Create AI images with customizable prompts and parameters
-- **User-friendly Interface**: Simple web UI with visual feedback at each step
 
 ## Project Structure
 
@@ -51,17 +48,17 @@ ImageGen/
 cd backend
 
 # Create and activate virtual environment
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 
 # Start the Flask server
-python app.py
+python3 app.py
 ```
 
-The backend server will start on http://localhost:5000.
+The backend server will start on http://localhost:5001
 
 ### 2. Set Up Frontend
 
@@ -76,7 +73,7 @@ npm install
 npm run dev
 ```
 
-The frontend will start on http://localhost:5173 (or another port if specified).
+The frontend will start on http://localhost:5173
 
 ### 3. Use the Application
 
