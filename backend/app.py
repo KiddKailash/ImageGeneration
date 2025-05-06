@@ -15,7 +15,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import torch
 
-from dalle_person import train, generate, build_training_dataset
+from dalle_model import train, generate, build_training_dataset
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -36,7 +36,7 @@ CHECKPOINT_DIR.mkdir(exist_ok=True)
 def status():
     """Check if server is running."""
     return jsonify({
-        "status": "operational",
+        "status": "online",
         "cuda_available": torch.cuda.is_available(),
         "device": "cuda" if torch.cuda.is_available() else "cpu"
     })

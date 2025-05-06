@@ -16,7 +16,7 @@ from rich.logging import RichHandler
 from rich import print as rprint
 import torch
 
-from dalle_person import train, generate
+from dalle_model import train, generate
 
 # Configure rich console for better output
 console = Console()
