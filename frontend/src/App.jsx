@@ -1,28 +1,28 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { 
-  Box, 
-  Container, 
-  Typography, 
-  Tabs, 
-  Tab, 
-  Paper, 
-  Divider,
-  Chip,
-  AppBar,
-  Toolbar,
-  useTheme,
-  useMediaQuery
-} from '@mui/material';
-import { 
-  CloudUpload as UploadIcon, 
-  Psychology as TrainingIcon, 
-  Image as GenerateIcon 
-} from '@mui/icons-material';
 
+// Local Components
 import Upload from './components/Upload';
 import Training from './components/Training';
 import Generation from './components/Generation';
+
+// MUI Components
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Paper from '@mui/material/Paper';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Chip from '@mui/material/Chip';
+import Container from '@mui/material/Container';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+
+// MUI Icons
+import UploadIcon from '@mui/icons-material/CloudUpload';
+import TrainingIcon from '@mui/icons-material/Psychology';
+import GenerateIcon from '@mui/icons-material/Image';
 
 // API Base URL - using environment variable with fallback
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
