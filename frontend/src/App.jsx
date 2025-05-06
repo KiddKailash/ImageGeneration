@@ -73,7 +73,7 @@ function App() {
             label={`Server: ${serverStatus}`} 
             size="small"
             color={
-              serverStatus === 'operational' ? 'success' : 
+              serverStatus === 'online' ? 'success' : 
               serverStatus === 'connecting' ? 'warning' : 'error'
             }
             variant="outlined"
