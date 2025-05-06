@@ -1,3 +1,15 @@
+*/.env
+
+# Backend
+.venv
+.DS_Store
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+.python-version
+
 # Logs
 logs
 *.log
@@ -7,9 +19,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+*/node_modules
+frontend/package-lock.json
+*/dist
+*/dist-ssr
 *.local
 
 # Editor directories and files

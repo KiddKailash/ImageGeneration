@@ -1,138 +1,119 @@
-# Personal Image Generation with DALL-E
+# Personal DALL-E Backend
 
-Fine-tune a lightweight, open-source DALL-E model on your personal photos to generate new AI images featuring you in any setting or style you can imagine! This project allows you to create a personalized image generation model with just a few photos.
+Flask API server for fine-tuning and running a lightweight DALL-E model on personal photos.
 
-> **⚠️ Disclaimer**  
-> Training generative models on personal images can potentially reveal identity information.  
-> Please keep your training data private and use generated images responsibly.
+## Architecture
 
-## Setup
+The backend consists of several key components:
 
-1. **Environment Setup**
-```bash
-# Create and activate virtual environment
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+- `app.py`: Flask RESTful API with endpoints for uploads, training, and generation
+- `dalle_person.py`: Core functionality for DALL-E model training and image generation
+- `cli.py`: Command-line interface for the same functionality
 
-# Install dependencies
-pip install -r requirements.txt
-```
+## API Endpoints
 
-2. **Prepare Training Data**
-   - Create a `training_images` directory
-   - Add 5-20 high-quality photos of the subject
-   - Photos should be:
-     - Well-lit and clear
-     - Showing different angles/expressions
-     - In JPG or PNG format
-     - Ideally with neutral backgrounds
-
-## CLI Usage
-
-The project provides a user-friendly command-line interface with two main commands: `train` and `generate`.
-
-### Training the Model
-
-```bash
-python cli.py train \
-    --subject_token "your_name" \
-    --epochs 5 \
-    --batch_size 4 \
-    --lr 1e-4
-```
-
-Training Parameters:
-- `--subject_token` (required): Unique identifier for the person (e.g., "john" or "sarah")
-- `--image_dir`: Directory containing training images (default: "training_images")
-- `--epochs`: Number of training iterations (default: 5)
-- `--batch_size`: Images per training batch (default: 4)
-- `--lr`: Learning rate (default: 0.0001)
-- `--resume_path`: Path to checkpoint to resume training from (optional)
-- `--save_every`: Save checkpoint every N epochs (default: 1)
-
-### Generating Images
-
-```bash
-python cli.py generate \
-    --prompt "a photo of your_name in paris" \
-    --dalle_ckpt "checkpoints/dalle.pt" \
-    --num_images 4
-```
-
-Generation Parameters:
-- `--prompt` (required): Text description including your subject_token
-- `--dalle_ckpt` (required): Path to your trained model checkpoint
-- `--num_images`: Number of images to generate (default: 4)
-- `--temperature`: Controls randomness (0.0-1.0, default: 1.0)
-- `--top_k`: Controls diversity (higher = more diverse, default: 64)
-- `--seed`: Random seed for reproducibility (optional)
-
-### Example Workflow
-
-1. **Train the model**:
-```bash
-# Basic training
-python cli.py train --subject_token "john"
-
-# Advanced training with custom parameters
-python cli.py train \
-    --subject_token "john" \
-    --epochs 10 \
-    --batch_size 8 \
-    --lr 5e-5 \
-    --save_every 2
-```
-
-2. **Generate images**:
-```bash
-# Basic generation
-python cli.py generate \
-    --prompt "a photo of john as an astronaut" \
-    --dalle_ckpt "checkpoints/dalle.pt"
-
-# Advanced generation with custom parameters
-python cli.py generate \
-    --prompt "a photo of john in a renaissance painting" \
-    --dalle_ckpt "checkpoints/dalle.pt" \
-    --num_images 6 \
-    --temperature 0.8 \
-    --top_k 128 \
-    --seed 42
-```
-
-## Tips for Best Results
-
-1. **Training Data Quality**
-   - Use consistent image sizes
-   - Avoid heavily edited or filtered photos
-   - Include a variety of facial expressions
-   - Ensure good lighting and clear visibility
-
-2. **Prompt Engineering**
-   - Always include "a photo of [subject_token]" in your prompts
-   - Be specific about the setting, style, or context
-   - Examples:
-     - "a photo of john as an astronaut"
-     - "a photo of sarah in a renaissance painting"
-     - "a professional headshot of alex"
-
-## Technical Details
-
-This implementation uses:
-- DALL-E pytorch implementation by lucidrains
-- OpenAI's discrete VAE architecture
-- Lightweight transformer configuration for quick fine-tuning
-- CUDA acceleration when available
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/status` | GET | Check server status and CUDA availability |
+| `/upload` | POST | Upload training images for a subject |
+| `/train` | POST | Train the model on a subject's images |
+| `/generate` | POST | Generate images using a trained model |
+| `/checkpoints` | GET | List available model checkpoints |
+| `/subjects` | GET | List available subject tokens |
+| `/images/<filename>` | GET | Serve generated images |
+| `/training-images/<subject>` | GET | List training images for a subject |
+| `/training-images/<subject>/<filename>` | GET | Serve training images |
 
 ## Requirements
 
 - Python 3.11+
-- PyTorch with CUDA (recommended) or CPU
-- See requirements.txt for full dependencies
+- PyTorch (>=2.2.0)
+- CUDA-enabled GPU (highly recommended)
+- Required packages in `requirements.txt`
+
+## Installation
+
+1. Create and activate a Python virtual environment:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
+
+2. Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+3. (Optional) To use CUDA acceleration, ensure you have compatible NVIDIA drivers installed.
+
+## Running the Server
+
+Start the Flask API server:
+
+```bash
+python app.py
+```
+
+The server will start on http://localhost:5000 by default.
+
+## Using the Command Line Interface
+
+In addition to the API, you can use the CLI for direct interactions:
+
+### Training a Model
+
+```bash
+python cli.py train --subject_token "john" --epochs 5
+```
+
+Optional parameters:
+- `--image_dir`: Directory containing training images (default: "training_images")
+- `--epochs`: Number of training iterations (default: 5)
+- `--batch_size`: Images per batch (default: 4)
+- `--lr`: Learning rate (default: 1e-4)
+- `--save_every`: Save checkpoint frequency (default: 1)
+
+### Generating Images
+
+```bash
+python cli.py generate --prompt "a photo of john in paris" --dalle_ckpt "checkpoints/dalle.pt"
+```
+
+Optional parameters:
+- `--num_images`: Number of images to generate (default: 4)
+- `--temperature`: Controls randomness (0.0-1.5, default: 1.0)
+- `--top_k`: Controls diversity (default: 64)
+- `--seed`: Random seed for reproducibility
+
+## Technical Notes
+
+- The model uses a modified version of lucidrains' DALL-E implementation
+- Training creates a checkpoint file in the `checkpoints/` directory
+- Generated images are saved in `generated_images/`
+- All images are stored as PNG files
+
+## Troubleshooting
+
+Common issues:
+
+1. **CUDA out of memory**: Reduce batch size or try running on CPU.
+2. **Missing dependencies**: Ensure all requirements are installed.
+3. **Permission errors**: Check filesystem permissions for the directories.
+4. **Slow performance**: Train with fewer epochs or use a GPU.
+
+## Development
+
+To modify the API or add new features:
+
+1. Modify `app.py` to add new endpoints
+2. Update `dalle_person.py` for model architecture changes
+3. Test locally before deploying
 
 ## License
 
-This project is MIT licensed. Please respect privacy and data protection laws when using this tool.
+This project is MIT licensed.
 
 ---
 
