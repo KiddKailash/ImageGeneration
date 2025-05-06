@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import axios from 'axios';
 
 // MUI components
 import Box from '@mui/material/Box';
@@ -15,6 +14,8 @@ import { styled } from '@mui/material/styles';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import UploadIcon from '@mui/icons-material/Upload';
 
+// API Services
+import { SubjectAPI } from '../services/api';
 
 // Styled components for file input
 const VisuallyHiddenInput = styled('input')({
@@ -29,7 +30,7 @@ const VisuallyHiddenInput = styled('input')({
   width: 1,
 });
 
-function Upload({ apiUrl, onSuccess }) {
+function Upload({ onSuccess }) {
   const [subjectToken, setSubjectToken] = useState('');
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
@@ -70,13 +71,9 @@ function Upload({ apiUrl, onSuccess }) {
     files.forEach(file => formData.append('images', file));
     
     try {
-      const response = await axios.post(`${apiUrl}/upload`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await SubjectAPI.uploadImages(subjectToken, formData);
       
-      setSuccess(`Successfully uploaded ${response.data.image_count} images for ${response.data.subject_token}`);
+      setSuccess(`Successfully uploaded ${response.image_count} images for ${response.subject_token}`);
       
       // Clear form
       setFiles([]);

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import axios from 'axios';
 
 // MUI components
 import Box from '@mui/material/Box';
@@ -33,8 +32,10 @@ import Delete from '@mui/icons-material/Delete';
 import Download from '@mui/icons-material/Download';
 import Refresh from '@mui/icons-material/Refresh';
 
+// API Services
+import { GenerationAPI } from '../services/api';
 
-function Generation({ apiUrl, checkpoints }) {
+function Generation({ checkpoints }) {
   const [selectedCheckpoint, setSelectedCheckpoint] = useState('');
   const [prompt, setPrompt] = useState('');
   const [negativePrompt, setNegativePrompt] = useState('');
@@ -62,15 +63,15 @@ function Generation({ apiUrl, checkpoints }) {
     setGeneratingImages(true);
     
     try {
-      const response = await axios.post(`${apiUrl}/generate`, {
-        checkpoint: selectedCheckpoint,
+      const response = await GenerationAPI.generateImages({
+        dalle_checkpoint: selectedCheckpoint,
         prompt,
         negative_prompt: negativePrompt,
         num_images: numImages,
-        guidance_scale: guidanceScale
+        temperature: guidanceScale
       });
       
-      setGeneratedImages(response.data.images.map(image => ({
+      setGeneratedImages(response.images.map(image => ({
         url: image,
         prompt,
         negative_prompt: negativePrompt,

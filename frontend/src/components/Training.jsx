@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 
 // MUI components
 import Box from '@mui/material/Box';
@@ -26,8 +25,11 @@ import Psychology from '@mui/icons-material/Psychology';
 import SaveAlt from '@mui/icons-material/SaveAlt';
 import Schedule from '@mui/icons-material/Schedule';
 
+// API Services
+import { SubjectAPI, TrainingAPI } from '../services/api';
 
-function Training({ apiUrl, subjects, onSuccess }) {
+
+function Training({ subjects, onSuccess }) {
   const [selectedSubject, setSelectedSubject] = useState('');
   const [trainingSteps, setTrainingSteps] = useState(150);
   const [learningRate, setLearningRate] = useState(0.0001);
@@ -48,8 +50,8 @@ function Training({ apiUrl, subjects, onSuccess }) {
 
   const fetchSubjectImages = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/images/${selectedSubject}`);
-      setSubjectImages(response.data.images || []);
+      const response = await SubjectAPI.getSubjectImages(selectedSubject);
+      setSubjectImages(response.images || []);
     } catch (error) {
       console.error('Error fetching images:', error);
       setSubjectImages([]);
@@ -78,19 +80,19 @@ function Training({ apiUrl, subjects, onSuccess }) {
     
     try {
       // Start training
-      const trainingResponse = await axios.post(`${apiUrl}/train`, {
+      const trainingResponse = await TrainingAPI.startTraining({
         subject_token: selectedSubject,
         steps: trainingSteps,
         learning_rate: learningRate
       });
       
-      const trainingId = trainingResponse.data.training_id;
+      const trainingId = trainingResponse.training_id;
       
       // Poll training status
       const pollInterval = setInterval(async () => {
         try {
-          const statusResponse = await axios.get(`${apiUrl}/training_status/${trainingId}`);
-          const { status, progress: currentProgress, preview_url, step } = statusResponse.data;
+          const statusResponse = await TrainingAPI.getTrainingStatus(trainingId);
+          const { status, progress: currentProgress, preview_url, step } = statusResponse;
           
           setProgress(currentProgress);
           
@@ -101,11 +103,11 @@ function Training({ apiUrl, subjects, onSuccess }) {
           
           if (status === 'completed') {
             clearInterval(pollInterval);
-            setSuccess(`Training completed successfully. Model saved as ${statusResponse.data.checkpoint_name}`);
+            setSuccess(`Training completed successfully. Model saved as ${statusResponse.checkpoint_name}`);
             setIsTraining(false);
             
             // Call onSuccess callback with checkpoint name
-            onSuccess(statusResponse.data.checkpoint_name);
+            onSuccess(statusResponse.checkpoint_name);
           } else if (status === 'failed') {
             clearInterval(pollInterval);
             setError('Training failed. Please try again.');
@@ -246,18 +248,19 @@ function Training({ apiUrl, subjects, onSuccess }) {
                   Training Progress: {Math.round(progress * 100)}%
                 </Typography>
               </Stack>
-              <LinearProgress 
-                variant="determinate" 
-                value={progress * 100} 
-                sx={{ height: 8, borderRadius: 1, mb: 2 }}
-              />
+              <LinearProgress variant="determinate" value={progress * 100} />
             </Box>
           )}
         </Grid>
-
+        
         <Grid item xs={12} md={6}>
-          <Box sx={{ height: '100%' }}>
-            {selectedSubject && subjectImages.length > 0 ? (
+          <Box sx={{ 
+            height: '100%', 
+            display: 'flex', 
+            flexDirection: 'column',
+            justifyContent: 'flex-start'
+          }}>
+            {subjectImages.length > 0 ? (
               <Box>
                 <Typography variant="subtitle1" gutterBottom>
                   Training Images
@@ -265,20 +268,21 @@ function Training({ apiUrl, subjects, onSuccess }) {
                 <Divider sx={{ mb: 2 }} />
                 <Grid container spacing={1}>
                   {subjectImages.slice(0, 8).map((image, index) => (
-                    <Grid item xs={6} sm={4} key={index}>
+                    <Grid item xs={3} key={index}>
                       <Box
                         sx={{
+                          width: '100%',
+                          paddingTop: '100%',
                           position: 'relative',
-                          paddingTop: '100%', // 1:1 aspect ratio
-                          overflow: 'hidden',
                           borderRadius: 1,
+                          overflow: 'hidden',
                           border: '1px solid',
                           borderColor: 'divider',
                         }}
                       >
                         <Box
                           component="img"
-                          src={`${apiUrl}${image}`}
+                          src={image}
                           alt={`Subject ${index + 1}`}
                           sx={{
                             position: 'absolute',
@@ -346,4 +350,4 @@ function Training({ apiUrl, subjects, onSuccess }) {
   );
 }
 
-export default Training; 
+export default Training;
