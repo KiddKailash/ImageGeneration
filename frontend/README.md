@@ -20,20 +20,18 @@ React web application for interacting with the DALL-E personal image generation 
 
 ```
 frontend/
-├── src/                 # React source code
-│   ├── components/      # React components
-│   │   ├── Upload.jsx   # Upload interface component
-│   │   ├── Training.jsx # Training interface component
-│   │   └── Generation.jsx # Generation interface component
-│   ├── App.jsx          # Main application component
-│   ├── main.jsx         # Application entry point
-│   └── index.css        # Global CSS including Tailwind
-├── public/              # Static assets
-├── index.html           # HTML entry point
-├── package.json         # Dependencies and scripts
-├── vite.config.js       # Vite configuration
-├── tailwind.config.js   # Tailwind CSS configuration
-└── postcss.config.js    # PostCSS configuration
+├── src/                    # React source code
+│   ├── components/         # React components
+│   │   ├── Upload.jsx      # Upload interface component
+│   │   ├── Training.jsx    # Training interface component
+│   │   └── Generation.jsx  # Generation interface component
+│   ├── App.jsx             # Main application component
+│   └── main.jsx            # Application entry point
+├── public/                 # Static assets
+├── index.html              # HTML entry point
+├── package.json            # Dependencies and scripts
+└── vite.config.js          # Vite configuration
+
 ```
 
 ## Requirements
